@@ -27,3 +27,14 @@ In macOS 10.15 Catalina, Apple 为所有 macOS计算机介绍了一个新的 "au
 
 如果你想在使用 **Electron > 8.0.0** 的时候进行 opt-out, 你必须将 `Info.plist` 文件中的 `NSRequiresAquaSystemAppearance` 属性设置为 `true`. 请记住 **Electron 8.0.0 及以上** 不会允许你进行主题的 opt-out, 由于 macOS 10.14 SDK 的使用。
 
+## 示例
+
+此示例演示了Electron 应用程序从 `nativeTheme` 中获取主题颜色。 此外，它还使用 IPC 通道提供主题切换和重置控制。
+
+<br>
+
+查看 `apps/00002/00002`
+
+```
+npm start -- -p apps/00002/00002/main.js
+```
