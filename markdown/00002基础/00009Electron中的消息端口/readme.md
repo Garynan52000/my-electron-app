@@ -52,3 +52,31 @@ ipcMain.on('port', (event) => {
 ## 主进程中的 MessagePorts
 
 在 renderer 中， `MessagePorts` 类和 web 上的表现完全一致。不过，主进程不是一个网页，它没有Blink集成，因此它没有 `MessagePort` 或 `MessageChannel` 类。为了在主进程中处理 MessagePorts 并与之交互，Electron添加了两个新类: (`MessagePortMain`)[https://www.electronjs.org/zh/docs/latest/api/message-port-main] 和 (`MessageChannelMain`)[https://www.electronjs.org/zh/docs/latest/api/message-channel-main]。它们的行为类似于渲染器中的类似类。
+
+<br>
+
+`MessagePort` 对象可以既可以被 renderer 创建，也能被主进程创建，并使用 (`ipcRenderer.postMessage`)[https://www.electronjs.org/zh/docs/latest/api/ipc-renderer#ipcrendererpostmessagechannel-message-transfer] 和 (`WebContents.postMessage`)[https://www.electronjs.org/zh/docs/latest/api/web-contents#contentspostmessagechannel-message-transfer] 方法来回传递。请注意，通常的 IPC 方法如 `send` 和 `invoke` 不能用于传输 `MessagePort`，只有 `postMessage` 方法可以传输 `MessagePort`。通过主进程传递 `MessagePort`s，您可以连接两个可能无法通信的页面（例如，由于同源限制）。
+
+## Extension: close event 扩展：关闭事件
+
+Electron 向 `MessagePort` 添加了 Web 上不存在的一项功能，以使 MessagePorts 更有用。那就是 `close` 事件，它在通道的另一端关闭时发出。端口也可以通过垃圾收集来隐式关闭。在渲染器中，您可以通过分配给 `port.onclose` 或调用 `port.addEventListener('close', ...)` 来监听关闭事件。在主进程中，可以通过调用 `port.on('close', ...)` 来监听 `close` 事件。
+
+## 示例
+
+#### Worker 进程
+
+在此示例中，您的应用程序有一个作为隐藏窗口实现的工作进程。您希望应用程序页面能够直接与工作进程通信，而无需通过主进程进行中继的性能开销。
+
+<br>
+
+查看 `apps/00002/00009/00001/`
+
+```
+npm start -- -p apps/00002/00009/00001/main.js
+```
+
+<br>
+
+## Reply streams​ 以流的形式应答
+
+Electron 的内置 IPC 方法仅支持两种模式：即发即弃（e,g `send`）或请求-响应（e.g. `invoke`）。使用 MessageChannels，您可以实现 “response stream”，其中单个请求以数据流进行响应。
