@@ -7,9 +7,8 @@ app.whenReady().then(async () => {
     // to a full Blink context (including e.g. <canvas>, audio, fetch(), etc.)
     const worker = new BrowserWindow({
         show: false,
-        webPreferences: { nodeIntegration: true },
-        // 定义预加载文件
-        webPreferences: {
+        webPreferences: { 
+            nodeIntegration: true,
             preload: path.join(__dirname, 'preload-worker.js')
         }
     })
@@ -18,9 +17,8 @@ app.whenReady().then(async () => {
     // The main window will send work to the worker process and receive results
     // over a MessagePort.
     const mainWindow = new BrowserWindow({
-        webPreferences: { nodeIntegration: true },
-        // 定义预加载文件
-        webPreferences: {
+        webPreferences: { 
+            nodeIntegration: true,
             preload: path.join(__dirname, 'preload-app.js')
         }
     })

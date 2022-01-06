@@ -3,9 +3,8 @@ const path = require('path');
 
 app.whenReady().then(async () => {
     const mainWindow = new BrowserWindow({
-        webPreferences: { nodeIntegration: true },
-        // 定义预加载文件
-        webPreferences: {
+        webPreferences: { 
+            nodeIntegration: true,
             preload: path.join(__dirname, 'preload.js')
         }
     })
@@ -19,8 +18,13 @@ app.whenReady().then(async () => {
         // Here we send the messages synchronously, but we could just as easily store
         // the port somewhere and send messages asynchronously.
         
-        for ( let i = 0; i < msg.count; i++) {
-            replyPort.postMessage(msg.element)
+        for (let i = 0; i < msg.count; i++) {
+            await new Promise((_resolve) => {
+                setTimeout(() => {
+                    replyPort.postMessage(msg.element)
+                    _resolve()    
+                }, 1000);
+            })
         }
     
         // We close the port when we're done to indicate to the other end that we

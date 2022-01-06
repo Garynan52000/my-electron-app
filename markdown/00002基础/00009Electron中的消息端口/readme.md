@@ -80,3 +80,28 @@ npm start -- -p apps/00002/00009/00001/main.js
 ## Reply streams​ 以流的形式应答
 
 Electron 的内置 IPC 方法仅支持两种模式：即发即弃（e,g `send`）或请求-响应（e.g. `invoke`）。使用 MessageChannels，您可以实现 “response stream”，其中单个请求以数据流进行响应。
+
+<br>
+
+查看 `apps/00002/00009/00002/`
+
+```
+npm start -- -p apps/00002/00009/00002/main.js
+```
+
+<br>
+
+## 在主进程和上下文隔离页面的主世界之间直接通信
+
+启用 (上下文隔离)[https://www.electronjs.org/zh/docs/latest/tutorial/context-isolation] 后，从主进程到 renderer 的 IPC 消息将传递到隔离世界，而不是主世界。有时你想直接将消息传递到主世界，而不必穿过孤立的世界。
+
+<br>
+
+查看 `apps/00002/00009/00003/`
+
+```
+npm start -- -p apps/00002/00009/00003/main.js
+```
+
+<br>
+

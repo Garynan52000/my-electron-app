@@ -24,6 +24,6 @@ function makeStreamingRequest(element, callback) {
 }
 
 makeStreamingRequest(42, (data) => {
-    console.log('got response data:', event.data)
+    console.log('got response data:', data)
 })
 // We will see "got response data: 42" 10 times.
