@@ -61,3 +61,33 @@ Electron尝试将应用程序用户模型 ID 的相关工作自动化。 Electro
 此外，在Windows 8中，通知正文的最大长度为250个字符，Windows团队建议将通知保留为200个字符。 然而，Windows 10中已经删除了这个限制，但是Windows团队要求开发人员合理使用。 尝试将大量文本发送到API(数千个字符) 可能会导致不稳定。
 
 ###### 高级通知
+
+Windows 的更高版本允许高级通知，自定义模板，图像和其他灵活元素。 要发送这些通知(来自主进程或渲染器进程)，请使用用户区模块 (electron-windows-notifications)[https://github.com/felixrieseberg/electron-windows-notifications] 来用原生节点附件发送 `ToastNotification` 和 `TileNotification` 对象。
+
+<br>
+
+当包括按钮在内的通知使用 `electron-windows-notifications` 时，处理回复需要使用 (`electron-windows-interactive-notifications`)[https://github.com/felixrieseberg/electron-windows-interactive-notifications] 帮助注册所需的 COM 组件并调用您的 Electron 应用程序和输入的用户数据。
+
+<br>
+
+**免打扰模式 / 演示模式**
+
+<br>
+
+如果要检测是否允许发送通知，请使用 (electron-notification-state)[https://github.com/felixrieseberg/electron-notification-state] 模块。这样，您可以提前确定 Windows 是否会将通知忽略。
+
+#### macOS
+
+MacOS上的通知是最直接的，但你应该注意(苹果关于通知的人机接口指南（Apple's Human Interface guidelines regarding notifications）)[https://developer.apple.com/macos/human-interface-guidelines/system-capabilities/notifications/].
+
+<br>
+
+请注意，通知的大小限制为256个字节，如果超过该限制，则会被截断。
+
+**勿扰 / 会话状态**
+
+要检测是否允许发送通知，请使用用户区模块 (electron-notification-state)[https://github.com/felixrieseberg/electron-notification-state]。这样可以提前检测是否显示通知。
+
+#### Linux
+
+通知是通过 `libnotify` 发送的，libnotify可以在任何实现了(桌面通知规范（Desktop Notifications Specification）)[https://developer.gnome.org/notification-spec/]的桌面环境中发送通知，包括Cinnamon、Enlightenment、Unity、GNOME、KDE
