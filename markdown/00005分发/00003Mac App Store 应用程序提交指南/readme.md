@@ -202,7 +202,7 @@ electron-osx-sign YourApp.app --identity='Apple Distribution'
 
 #### Sign apps for distribution outside the Mac App Store
 
-如果您不打算将应用程序提交到 Mac App Store，您可以签署“开发者 ID 申请”证书。 这样对 App Sandbox 没有要求，如果你不使用 App Sandbox，你应该使用 Electron 的普通 darwin 构建。
+如果您不打算将应用程序提交到 Mac App Store，您可以签署 “Developer ID Application” 证书。 这样对 App Sandbox 没有要求，如果你不使用 App Sandbox，你应该使用 Electron 的普通 darwin 构建。
 
 <br>
 
@@ -217,3 +217,117 @@ electron-osx-sign YourApp.app --identity='Developer ID Application' --no-gatekee
 <br>
 
 本指南不涉及 (App Notarization)[https://developer.apple.com/documentation/security/notarizing_macos_software_before_distribution]，但您可能希望这样做，否则 Apple 可能会阻止用户在 Mac App Store 之外使用您的应用程序。
+
+#### Submit Apps to the Mac App Store
+
+使用“Apple Distribution”证书签署应用程序后，您可以继续将其提交到 Mac App Store。
+
+<br>
+
+但是，本指南并不能确保您的应用会获得 Apple 的批准； 您仍然需要阅读 Apple 的(提交您的应用程序指南)[https://developer.apple.com/library/mac/documentation/IDEs/Conceptual/AppDistributionGuide/SubmittingYourApp/SubmittingYourApp.html]，了解如何满足 Mac App Store 的要求。
+
+###### Upload
+
+应用程序加载器应用于将签名的应用程序上传到 iTunes Connect 进行处理，请确保您在上传之前已(创建记录)[https://developer.apple.com/library/ios/documentation/LanguagesUtilities/Conceptual/iTunesConnect_Guide/Chapters/CreatingiTunesConnectRecord.html]。
+
+<br>
+
+如果您看到类似私有 API 使用的错误，您应该检查应用程序是否使用了 Electron 的 MAS 构建。
+
+#### Submit for review
+
+上传后，您应该提(交您的应用以供审核。)[https://developer.apple.com/library/ios/documentation/LanguagesUtilities/Conceptual/iTunesConnect_Guide/Chapters/SubmittingTheApp.html]
+
+## MAS 构建限制
+
+为了让你的应用满足沙箱的所有条件，在 MAS 构建的时候，下面的模块已被禁用：
+
+<br>
+
+- `crashReporter`
+- `autoUpdater`
+
+<br>
+
+并且下面的行为也改变了
+
+<br>
+
+- 一些视频采集功能无效。
+- 某些辅助功能无法访问。
+- 应用无法检测 DNS 变化。
+
+<br>
+
+此外，由于应用沙盒的使用，应用程序可以访问的资源受到严格限制；您可以阅读 (应用沙盒)[https://developer.apple.com/app-sandboxing/] ，了解更多信息。
+
+#### 附加权利
+
+根据您的应用使用的 Electron API，您可能需要在应用的权利文件中添加额外的权利。 否则，App Sandbox 可能会阻止您使用它们。
+
+###### Network access
+
+启用传出的网络连接，允许你的应用程序连接到服务器：
+
+<br>
+
+```
+<key>com.apple.security.network.client</key>
+<true/>
+```
+
+<br>
+
+启用传入的网络连接，让你的应用程序打开网络 socket 监听：
+
+<br>
+
+```
+<key>com.apple.security.network.server</key>
+<true/>
+```
+
+<br>
+
+有关更多 详细信息，请参阅(启用网络访问文档)[https://developer.apple.com/library/ios/documentation/Miscellaneous/Reference/EntitlementKeyReference/Chapters/EnablingAppSandbox.html#//apple_ref/doc/uid/TP40011195-CH4-SW9]。
+
+###### dialog.showOpenDialog
+
+```
+<key>com.apple.security.files.user-selected.read-only</key>
+<true/>
+```
+
+<br>
+
+有关更多详细信息，请参阅("启用访问用户选择的文件"文档)[https://developer.apple.com/library/mac/documentation/Miscellaneous/Reference/EntitlementKeyReference/Chapters/EnablingAppSandbox.html#//apple_ref/doc/uid/TP40011195-CH4-SW6]。
+
+## Electron 使用的加密算法
+
+根据你发布应用所在的国家或地区，你可能需要提供您软件使用的加密算法的信息。 更多信息，请参阅 (加密导出合规性文档)[https://help.apple.com/app-store-connect/#/devc3f64248f] 。
+
+<br>
+
+- AES - (NIST SP 800-38A)[https://csrc.nist.gov/publications/nistpubs/800-38a/sp800-38a.pdf], (NIST SP 800-38D)[https://csrc.nist.gov/publications/nistpubs/800-38D/SP-800-38D.pdf], (RFC 3394)[https://www.ietf.org/rfc/rfc3394.txt]
+- HMAC - (FIPS 198-1)[https://csrc.nist.gov/publications/fips/fips198-1/FIPS-198-1_final.pdf]
+- ECDSA - ANS X9.62–2005
+- ECDH - ANS X9.63–2001
+- HKDF - (NIST SP 800-56C)[https://csrc.nist.gov/publications/nistpubs/800-56C/SP-800-56C.pdf]
+- PBKDF2 - (RFC 2898)[https://tools.ietf.org/html/rfc2898]
+- RSA - (RFC 3447)[https://www.ietf.org/rfc/rfc3447]
+- SHA - (FIPS 180-4)[https://csrc.nist.gov/publications/fips/fips180-4/fips-180-4.pdf]
+- Blowfish - (https://www.schneier.com/cryptography/blowfish/)[https://www.schneier.com/cryptography/blowfish/]
+- CAST - (RFC 2144)[https://tools.ietf.org/html/rfc2144], (RFC 2612)[https://tools.ietf.org/html/rfc2612]
+- DES - (FIPS 46-3)[https://csrc.nist.gov/publications/fips/fips46-3/fips46-3.pdf]
+- DH - (RFC 2631)[https://tools.ietf.org/html/rfc2631]
+- DSA - (ANSI X9.30)[https://webstore.ansi.org/RecordDetail.aspx?sku=ANSI+X9.30-1%3A1997]
+- EC - (SEC 1)[https://www.secg.org/sec1-v2.pdf]
+- IDEA - "On the Design and Security of Block Ciphers" book by X. Lai
+- MD2 - (RFC 1319)[https://tools.ietf.org/html/rfc1319]
+- MD4 - (RFC 6150)[https://tools.ietf.org/html/rfc6150]
+- MD5 - (RFC 1321)[https://tools.ietf.org/html/rfc1321]
+- MDC2 - (ISO/IEC 10118-2)[https://wiki.openssl.org/index.php/Manual:Mdc2(3)]
+- RC2 - (RFC 2268)[https://tools.ietf.org/html/rfc2268]
+- RC4 - (RFC 4345)[https://tools.ietf.org/html/rfc4345]
+- RC5 - (https://people.csail.mit.edu/rivest/Rivest-rc5rev.pdf)[https://people.csail.mit.edu/rivest/Rivest-rc5rev.pdf]
+- RIPEMD - (ISO/IEC 10118-3)[https://webstore.ansi.org/RecordDetail.aspx?sku=ISO%2FIEC%2010118-3:2004]
